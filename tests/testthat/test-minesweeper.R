@@ -82,3 +82,134 @@ test_that("createInitialState works", {
   expect_equal(dim(state$flagged), c(20, 15))
   expect_equal(any(state$flagged), FALSE)
 })
+
+test_that("flagMine works", {
+  mines = createMinesGrid(nrow=20, ncol=15, nmines=30)
+  game = createGame(mines)
+  state = createInitialState(game)
+
+
+  expect_equal(
+    flagMine(state, 3, 5)$flagged[3, 5],
+    TRUE
+  )
+
+  expect_equal(
+    flagMine(state, 9, 1)$flagged[9, 1],
+    TRUE
+  )
+
+  # test idempotence
+  expect_equal(
+    flagMine(flagMine(state, 3, 5))$flagged[3, 5],
+    TRUE
+  )
+})
+
+test_that("unflagMine works", {
+  mines = createMinesGrid(nrow=20, ncol=15, nmines=30)
+  game = createGame(mines)
+  state = createInitialState(game)
+  state = flagMine(state, 3, 5)
+  state = flagMine(state, 9, 1)
+
+  expect_equal(
+    unflagMine(state, 3, 5)$flagged[3, 5],
+    FALSE
+  )
+
+  expect_equal(
+    unflagMine(state, 9, 1)$flagged[9, 1],
+    FALSE
+  )
+
+
+  # test idempotence
+  expect_equal(
+    unflagMine(unflagMine(state, 3, 5))$flagged[3, 5],
+    FALSE
+  )
+})
+
+test_that("checkMine works", {
+  mines = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+    0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1, 0, 1,
+    0, 0, 0, 1, 0, 1, 0, 0
+  )))
+
+  game = createGame(mines)
+  state = createInitialState(game)
+
+  expect_equal(
+    checkMine(game, state, 1, 2)$checked,
+    matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+      0, 1, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0
+    )))
+  )
+
+  expect_equal(
+    checkMine(game, state, 2, 4)$checked,
+    matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+      0, 1, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0
+    )))
+  )
+
+  expect_equal(
+    checkMine(game, state, 2, 1)$checked,
+    matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+      0, 0, 0, 0, 0, 0, 0, 0,
+      1, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0
+    )))
+  )
+})
+
+test_that("gameStatus works", {
+  mines = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+    0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 1, 0, 1,
+    0, 0, 0, 1, 0, 1, 0, 0
+  )))
+
+  game = createGame(mines)
+
+  state = createInitialState(game)
+  expect_equal(
+    gameStatus(game, state),
+    "ongoing"
+  )
+
+  state = list(
+    flagged = state$flagged,
+    checked = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+      0, 0, 0, 0, 0, 0, 0, 0,
+      1, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0
+    )))
+  )
+  expect_equal(
+    gameStatus(game, state),
+    "defeat"
+  )
+
+  state = list(
+    flagged = state$flagged,
+    checked = !mines
+  )
+
+  expect_equal(
+    gameStatus(game, state),
+    "victory"
+  )
+})

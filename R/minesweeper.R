@@ -70,17 +70,6 @@ unflagMine <- function(state, i, j) {
   state
 }
 
-gameStatus <- function(game, state) {
-  if (any(problem$mines & state$checked)) {
-    return("defeat")
-  }
-
-  if (all(xor(problem$mines, state$checked))) {
-    return("victory")
-  }
-
-  "ongoing"
-}
 
 checkMine <- function(game, state, i, j) {
   if (state$checked[i, j]) {
@@ -90,15 +79,29 @@ checkMine <- function(game, state, i, j) {
   state$checked[i, j] = TRUE
 
   if (game$nearby_mines[i, j] == 0) {
+    coords = nearbyCoords(i, j, nrow=game$nrow, ncol=game$ncol)
     for (i in coords$i) {
-      for (j in coords$i) {
-        state = check_mine(game, state, i, j)
+      for (j in coords$j) {
+        state = checkMine(game, state, i, j)
       }
     }
   }
 
   state
 }
+
+gameStatus <- function(game, state) {
+  if (any(game$mines & state$checked)) {
+    return("defeat")
+  }
+
+  if (all(xor(game$mines, state$checked))) {
+    return("victory")
+  }
+
+  "ongoing"
+}
+
 
 display <- function(game, state) {
   ifelse(
