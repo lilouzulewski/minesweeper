@@ -114,3 +114,19 @@ display <- function(game, state) {
     )
   )
 }
+
+display2 <- function(game, state) {
+  result = mapply(function(checked, flagged, nearby_mines) {
+    if (checked) {
+      return(nearby_mines)
+    }
+
+    if (flagged) {
+      return("!")
+    }
+
+    return("*")
+  }, state$checked, state$flagged, game$nearby_mines)
+
+  matrix(result, nrow=game$nrow, ncol=game$ncol)
+}
