@@ -42,7 +42,7 @@ inputGameGridUi <- function(inputId, game, state) {
       return el.closest(".minesweeper-grid").data("input-id")
     }
 
-    $(document).on("click", ".minesweeper-grid .hidden-cell", function(event) {
+    $(document).on("click", ".minesweeper-grid.ongoing .hidden-cell", function(event) {
       const target = $(event.target)
       const id = getId(target)
 
@@ -52,7 +52,7 @@ inputGameGridUi <- function(inputId, game, state) {
       })
     })
 
-    $(document).on("contextmenu", ".minesweeper-grid .hidden-cell", function(event) {
+    $(document).on("contextmenu", ".minesweeper-grid.ongoing .hidden-cell", function(event) {
       const target = $(event.target)
       const id = getId(target)
 
@@ -62,7 +62,7 @@ inputGameGridUi <- function(inputId, game, state) {
       })
     })
 
-    $(document).on("contextmenu", ".minesweeper-grid .flagged-cell", function(event) {
+    $(document).on("contextmenu", ".minesweeper-grid.ongoing .flagged-cell", function(event) {
       const target = $(event.target)
       const id = getId(target)
 
@@ -90,9 +90,9 @@ inputGameGridUi <- function(inputId, game, state) {
     tagList(
       singleton(tags$head(tags$script(jscode))),
       tags$svg(`data-input-id` = inputId,
-        class = "minesweeper-grid",
+        class = sprintf("minesweeper-grid %s", status),
         width = "100%",
-        viewBox = sprintf("0 0 %d %d", game$ncol, game$nrow),
+        viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
         tagList(cells)
       )
     )

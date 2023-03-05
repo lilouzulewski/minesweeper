@@ -173,6 +173,16 @@ test_that("checkCell works", {
   )
 })
 
+test_that("checkCell reasonnable memory usage", {
+  mines = matrix(nrow=50, ncol=50, data=FALSE)
+  game = createGame(mines)
+  state = createInitialState(game)
+
+  expect_no_error({
+    checkCell(game, state, 1, 1)
+  })
+})
+
 test_that("gameStatus works", {
   mines = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
     0, 0, 0, 0, 0, 0, 0, 0,

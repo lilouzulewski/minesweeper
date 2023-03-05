@@ -1,3 +1,4 @@
+
 createGame <- function(mines) {
   list(
     nrow = nrow(mines),
@@ -19,10 +20,10 @@ createMinesGrid <- function(nrow, ncol, nmines) {
 }
 
 nearbyCoords <- function(i, j, nrow, ncol) {
-  expand.grid(
+  as.matrix(expand.grid(
     i = max(1, i-1):min(nrow, i+1),
     j = max(1, j-1):min(ncol, j+1)
-  )
+  ))
 }
 
 countNearbyMines <- function(mines, i, j) {
@@ -71,23 +72,40 @@ unflagCell <- function(state, i, j) {
 }
 
 
-checkCell <- function(game, state, i, j) {
-  if (state$checked[i, j]) {
-    return(state)
-  }
+checkCell <- function(game, state, i, j, depth=0) {
+  # since R doesn't allow to pass arguments by reference we can't use the
+  # straightforward recursive algorithm because of memory usage issues
+  remaining_coords = matrix(ncol=2, data=c(i, j))
+  colnames(remaining_coords) <- c("i", "j")
 
-  state$checked[i, j] = TRUE
+  while (length(remaining_coords) > 0) {
+    last = nrow(remaining_coords)
 
-  if (game$nearby_mines[i, j] == 0) {
-    coords = nearbyCoords(i, j, nrow=game$nrow, ncol=game$ncol)
-    for (i in coords$i) {
-      for (j in coords$j) {
-        state = checkCell(game, state, i, j)
-      }
+    coords = remaining_coords[last,]
+    remaining_coords = remaining_coords[-last,, drop=FALSE]
+
+    i = coords["i"]
+    j = coords["j"]
+
+    if (state$checked[i, j]) {
+      next
+    }
+
+    state$checked[i, j] = TRUE
+
+    if (game$nearby_mines[i, j] == 0) {
+      remaining_coords = rbind(
+        remaining_coords,
+        nearbyCoords(i, j, nrow=game$nrow, ncol=game$ncol)
+      )
     }
   }
 
   state
+}
+
+mutableCheckCell <- function(game, state, i, j) {
+
 }
 
 gameStatus <- function(game, state) {
