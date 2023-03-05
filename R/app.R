@@ -114,29 +114,18 @@ startApp <- function() {
     ),
     mainPanel(
       uiOutput("minesweeper_grid_output"),
-      width=12
+      width=8
     )
   )
 
   server <- function(input, output) {
     reactiveState = reactiveVal()
     reactiveGame <- eventReactive(input$new_game, {
-      r"(
       mines = createMinesGrid(
         nrow=input$nrow,
         ncol=input$ncol,
         nmines=input$nmines
       )
-      )"
-
-      mines = matrix(nrow=6, ncol=12, byrow=TRUE, data=as.logical(c(
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
-        0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1,
-        0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0,
-        0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0,
-        0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0
-      )))
 
       game = createGame(mines)
       state = createInitialState(game)
