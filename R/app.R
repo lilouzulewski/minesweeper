@@ -1,5 +1,4 @@
 library(shiny)
-library(shinyjs)
 
 cellUi <- function(i, j, game, state) {
   # helper function to create image tag

@@ -10,8 +10,7 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    shiny (>= 1.7.4),
-    shinyjs (>= 2.1.0)
+    shiny (>= 1.7.4)
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
