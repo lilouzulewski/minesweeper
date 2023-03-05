@@ -60,18 +60,18 @@ createCheckedGrid <- function(nrow, ncol) {
   matrix(rep(FALSE, nrow * ncol), nrow=nrow, ncol=ncol)
 }
 
-flagMine <- function(state, i, j) {
+flagCell <- function(state, i, j) {
   state$flagged[i, j] = TRUE
   state
 }
 
-unflagMine <- function(state, i, j) {
+unflagCell <- function(state, i, j) {
   state$flagged[i, j] = FALSE
   state
 }
 
 
-checkMine <- function(game, state, i, j) {
+checkCell <- function(game, state, i, j) {
   if (state$checked[i, j]) {
     return(state)
   }
@@ -82,7 +82,7 @@ checkMine <- function(game, state, i, j) {
     coords = nearbyCoords(i, j, nrow=game$nrow, ncol=game$ncol)
     for (i in coords$i) {
       for (j in coords$j) {
-        state = checkMine(game, state, i, j)
+        state = checkCell(game, state, i, j)
       }
     }
   }
