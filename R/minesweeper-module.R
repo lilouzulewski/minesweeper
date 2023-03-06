@@ -1,30 +1,45 @@
 library(shiny)
 
-cellUI <- function(i, j, game, state) {
-  # helper function to create image tag
-  tag_image <- function(name, class="") {
-    tags$image(
-      href=sprintf("assets/svg/%s.svg", name),
-      class=class,
-      x=j,
-      y=i,
-      width=1,
-      height=1
-    )
-  }
-
-  status = if (state$checked[i, j]) {
-    tag_image(
-      sprintf("checked_%d", game$nearby_mines[i, j])
-    )
-  } else if (state$flagged[i, j]) {
-    tag_image("flag", class="flagged-cell")
-  } else {
-    tag_image("hidden", class="hidden-cell")
-  }
+# helper function to create cells
+cellUI <- function(i, j, name, class="") {
+  tags$image(
+    href = sprintf("assets/svg/%s.svg", name),
+    class = class,
+    x = j,
+    y = i,
+    width = 1,
+    height = 1
+  )
 }
 
-gridUI <- function(inputId, game, state) {
+hiddenCellUI <- function(i, j) {
+  cellUI(i, j, "hidden", class="hidden-cell")
+}
+
+flagCellUI <- function(i, j) {
+  cellUI(i, j, "flag", class="flagged-cell")
+}
+
+wrongFlagCellUI <- function(i, j) {
+  tagList(
+    cellUI(i, j, "flag"),
+    tags$rect(x=j, y=i, width=1, height=1, fill="rgba(255, 0, 0, 0.2)")
+  )
+}
+
+checkedCellUI <- function(i, j, nearby_mines) {
+  cellUI(i, j, sprintf("checked_%d", nearby_mines))
+}
+
+mineCellUI <- function(i, j) {
+  cellUI(i, j, "mine")
+}
+
+wrongCellUI <- function(i, j) {
+  cellUI(i, j, "wrong")
+}
+
+ongoingGridUI <- function(inputId, game, state) {
   jscode <- r"(
     // Disable menu display on right click on the grid
     $(document).on("contextmenu", ".minesweeper-grid", function(event) {
@@ -73,38 +88,88 @@ gridUI <- function(inputId, game, state) {
     })
   )"
 
-  status = gameStatus(game, state)
-
-  if (status == "victory") {
-    p("victory")
-  } else if (status == "defeat") {
-    p("defeat")
-  } else if (status == "ongoing") {
-    cells = list()
-    for (i in 1:game$nrow) {
-      for (j in 1:game$ncol) {
-        cells = append(cells, list(cellUI(i, j, game, state)))
+  cells = list()
+  for (i in 1:game$nrow) {
+    for (j in 1:game$ncol) {
+      cell = if (state$checked[i, j]) {
+        checkedCellUI(i, j, game$nearby_mines[i, j])
+      } else if (state$flagged[i, j]) {
+        flagCellUI(i, j)
+      } else {
+        hiddenCellUI(i, j)
       }
-    }
 
-    tagList(
-      singleton(tags$head(tags$script(jscode))),
-      tags$svg(
-        `data-input-id` = inputId,
-        class = sprintf("minesweeper-grid %s", status),
-        width = "100%",
-        viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
-        tagList(cells)
-      )
-    )
+      cells = append(cells, list(cell))
+    }
   }
+
+  tagList(
+    singleton(tags$head(tags$script(jscode))),
+    tags$svg(
+      `data-input-id` = inputId,
+      class = "minesweeper-grid ongoing",
+      width = "100%",
+      viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
+      tagList(cells)
+    )
+  )
+}
+
+defeatGridUI <- function(game, state) {
+  cells = list()
+  for (i in 1:game$nrow) {
+    for (j in 1:game$ncol) {
+      cell = if (state$checked[i, j] && game$mines[i, j]) {
+        wrongCellUI(i, j)
+      } else if (state$checked[i, j]) {
+        checkedCellUI(i, j, game$nearby_mines[i, j])
+      } else if (state$flagged[i, j] && !game$mines[i, j]) {
+        wrongFlagCellUI(i, j)
+      } else if (state$flagged[i, j]) {
+        flagCellUI(i, j)
+      } else if (game$mines[i, j]) {
+        mineCellUI(i, j)
+      } else {
+        hiddenCellUI(i, j)
+      }
+
+      cells = append(cells, list(cell))
+    }
+  }
+
+  tags$svg(
+    class = "play-grid defeat",
+    width = "100%",
+    viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
+    tagList(cells)
+  )
+}
+
+victoryGridUI <- function(game) {
+  cells = list()
+  for (i in 1:game$nrow) {
+    for (j in 1:game$ncol) {
+      cell = if (game$mines[i, j]) {
+        flagCellUI(i, j)
+      } else {
+        checkedCellUI(i, j, game$nearby_mines[i, j])
+      }
+
+      cells = append(cells, list(cell))
+    }
+  }
+
+  tags$svg(
+    class = "play-grid victory",
+    width = "100%",
+    viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
+    tagList(cells)
+  )
 }
 
 minesweeperUI <- function(id) {
   ns = NS(id)
-  tagList(
-    uiOutput(ns("play_grid"))
-  )
+  uiOutput(ns("play_grid"))
 }
 
 minesweeperServer <- function(
@@ -157,8 +222,15 @@ minesweeperServer <- function(
 
         game = reactiveGame()
         state = reactiveState()
+        status = gameStatus(game, state)
 
-        gridUI(ns("play_grid"), game, state)
+        if (status == "victory") {
+          victoryGridUI(game)
+        } else if (status == "defeat") {
+          defeatGridUI(game, state)
+        } else if (status == "ongoing") {
+          ongoingGridUI(ns("play_grid"), game, state)
+        }
       })
     }
   )
