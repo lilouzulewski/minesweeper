@@ -71,7 +71,6 @@ unflagCell <- function(state, i, j) {
   state
 }
 
-
 checkCell <- function(game, state, i, j) {
   # since R doesn't allow to pass arguments by reference we can't use the
   # straightforward recursive algorithm because of memory usage issues
