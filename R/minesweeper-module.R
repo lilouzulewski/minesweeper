@@ -64,7 +64,7 @@ ongoingGridUI <- function(inputId, game, state) {
       Shiny.setInputValue(id, {
         action: "checkCell",
         ...getCoords(target),
-      })
+      }, { priority: "event" })
     })
 
     $(document).on("contextmenu", ".minesweeper-grid.ongoing .hidden-cell", function(event) {
@@ -74,7 +74,7 @@ ongoingGridUI <- function(inputId, game, state) {
       Shiny.setInputValue(id, {
         action: "flagCell",
         ...getCoords(target),
-      })
+      }, { priority: "event" })
     })
 
     $(document).on("contextmenu", ".minesweeper-grid.ongoing .flagged-cell", function(event) {
@@ -84,7 +84,7 @@ ongoingGridUI <- function(inputId, game, state) {
       Shiny.setInputValue(id, {
         action: "unflagCell",
         ...getCoords(target),
-      })
+      }, { priority: "event" })
     })
   )"
 
