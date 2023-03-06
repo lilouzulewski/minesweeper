@@ -169,7 +169,11 @@ victoryGridUI <- function(game) {
 
 minesweeperUI <- function(id) {
   ns = NS(id)
-  uiOutput(ns("play_grid"))
+  tagList(
+    textOutput(ns("flag_count")),
+    textOutput(ns("timer")),
+    uiOutput(ns("play_grid"))
+  )
 }
 
 minesweeperServer <- function(
@@ -182,9 +186,13 @@ minesweeperServer <- function(
   moduleServer(
     id,
     function(input, output, session) {
+      elapsedTime = reactiveVal(0)
+
       reactiveState = reactiveVal()
 
       reactiveGame = eventReactive(reactiveStartGame(), {
+        elapsedTime(-1)
+
         mines = createMinesGrid(
           nrow=reactiveNrow(),
           ncol=reactiveNcol(),
@@ -195,6 +203,13 @@ minesweeperServer <- function(
         reactiveState(createInitialState(game))
 
         game
+      })
+
+      reactiveGameStatus = reactive({
+        game = reactiveGame()
+        state = reactiveState()
+
+        gameStatus(game, state)
       })
 
       observeEvent(input$play_grid, {
@@ -222,7 +237,7 @@ minesweeperServer <- function(
 
         game = reactiveGame()
         state = reactiveState()
-        status = gameStatus(game, state)
+        status = reactiveGameStatus()
 
         if (status == "victory") {
           victoryGridUI(game)
@@ -231,6 +246,27 @@ minesweeperServer <- function(
         } else if (status == "ongoing") {
           ongoingGridUI(ns("play_grid"), game, state)
         }
+      })
+
+      output$flag_count <- renderText({
+        game = reactiveGame()
+        state = reactiveState()
+
+        as.character(game$nmines - sum(state$flagged & !state$checked))
+      })
+
+      output$timer <- renderText({
+        status = reactiveGameStatus()
+
+        if (status == "ongoing") {
+          invalidateLater(1000)
+        }
+
+        isolate({
+          elapsedTime(elapsedTime() + 1)
+        })
+
+        as.character(elapsedTime())
       })
     }
   )
