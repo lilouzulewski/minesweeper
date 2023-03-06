@@ -183,6 +183,8 @@ minesweeperServer <- function(
   reactiveNcol,
   reactiveNmines
 ) {
+  addResourcePath("assets", system.file('assets', package="Minesweeper"))
+
   moduleServer(
     id,
     function(input, output, session) {

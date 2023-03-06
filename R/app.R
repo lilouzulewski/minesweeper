@@ -1,8 +1,6 @@
 library(shiny)
 
 startApp <- function() {
-  addResourcePath("assets", system.file('assets', package="Minesweeper"))
-
   ui <- fluidPage(
     titlePanel("Minesweeper"),
     helpText("Sweep them all"),
