@@ -104,10 +104,6 @@ checkCell <- function(game, state, i, j) {
   state
 }
 
-mutableCheckCell <- function(game, state, i, j) {
-
-}
-
 gameStatus <- function(game, state) {
   if (any(game$mines & state$checked)) {
     return("defeat")
@@ -118,33 +114,4 @@ gameStatus <- function(game, state) {
   }
 
   "ongoing"
-}
-
-
-display <- function(game, state) {
-  ifelse(
-    state$checked,
-    game$nearby_mines,
-    ifelse(
-      state$flagged,
-      "!",
-      "*"
-    )
-  )
-}
-
-display2 <- function(game, state) {
-  result = mapply(function(checked, flagged, nearby_mines) {
-    if (checked) {
-      return(nearby_mines)
-    }
-
-    if (flagged) {
-      return("!")
-    }
-
-    return("*")
-  }, state$checked, state$flagged, game$nearby_mines)
-
-  matrix(result, nrow=game$nrow, ncol=game$ncol)
 }
