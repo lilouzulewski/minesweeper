@@ -3,7 +3,7 @@ library(shiny)
 startApp <- function() {
   ui <- fluidPage(
     titlePanel("Minesweeper"),
-    helpText("Sweep them all"),
+    helpText("Left click to check cell, right click to flag mine"),
     sidebarPanel(
       numericInput("nrow", label = "Number of row", value = 10),
       numericInput("ncol", label = "Number of column", value = 10),

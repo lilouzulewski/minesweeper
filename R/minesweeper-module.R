@@ -170,6 +170,7 @@ victoryGridUI <- function(game) {
 minesweeperUI <- function(id) {
   ns = NS(id)
   tagList(
+    textOutput(ns("game_status")),
     textOutput(ns("flag_count")),
     textOutput(ns("timer")),
     uiOutput(ns("play_grid"))
@@ -250,11 +251,17 @@ minesweeperServer <- function(
         }
       })
 
+      output$game_status <- renderText({
+        status = reactiveGameStatus()
+
+        sprintf("Game status: %s", status)
+      })
+
       output$flag_count <- renderText({
         game = reactiveGame()
         state = reactiveState()
 
-        as.character(game$nmines - sum(state$flagged & !state$checked))
+        sprintf("Remaining flags: %d", game$nmines - sum(state$flagged & !state$checked))
       })
 
       output$timer <- renderText({
@@ -268,7 +275,7 @@ minesweeperServer <- function(
           elapsedTime(elapsedTime() + 1)
         })
 
-        as.character(elapsedTime())
+        sprintf("Elapsed time: %02d:%02d", floor(elapsedTime() / 60), elapsedTime() %% 60);
       })
     }
   )
