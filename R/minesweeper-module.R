@@ -227,7 +227,11 @@ minesweeperServer <- function(
         newState = if (action == "checkCell") {
           checkCell(game, state, i, j)
         } else if (action == "flagCell") {
-          flagCell(state, i, j)
+          if (sum(state$flagged) < game$nmines) {
+            flagCell(state, i, j)
+          } else {
+            state
+          }
         } else if (action == "unflagCell") {
           unflagCell(state, i, j)
         }
