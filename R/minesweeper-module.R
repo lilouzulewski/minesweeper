@@ -39,7 +39,8 @@ wrongCellUI <- function(i, j) {
   cellUI(i, j, "wrong")
 }
 
-ongoingGridUI <- function(inputId, game, state) {
+# helper function to create gridUI
+gridUI <- function(inputId, nrow, ncol, status, fun) {
   jscode <- r"(
     // Disable menu display on right click on the grid
     $(document).on("contextmenu", ".minesweeper-grid", function(event) {
@@ -88,38 +89,51 @@ ongoingGridUI <- function(inputId, game, state) {
     })
   )"
 
-  cells = list()
-  for (i in 1:game$nrow) {
-    for (j in 1:game$ncol) {
-      cell = if (state$checked[i, j]) {
+  cells = apply(expand.grid(1:nrow, 1:ncol), 1, function(index) {
+    i = index[1]
+    j = index[2]
+
+    fun(i, j)
+  })
+
+  tagList(
+    singleton(tags$head(tags$script(jscode))),
+    tags$svg(
+      `data-input-id` = inputId,
+      class = sprintf("minesweeper-grid %s", status),
+      width = 25 * ncol,
+      viewBox = sprintf("1 1 %d %d", ncol, nrow),
+      tagList(cells)
+    )
+  )
+}
+
+ongoingGridUI <- function(inputId, game, state) {
+  gridUI(
+    inputId = inputId,
+    nrow = game$nrow,
+    ncol = game$ncol,
+    status = "ongoing",
+    function(i, j) {
+      if (state$checked[i, j]) {
         checkedCellUI(i, j, game$nearby_mines[i, j])
       } else if (state$flagged[i, j]) {
         flagCellUI(i, j)
       } else {
         hiddenCellUI(i, j)
       }
-
-      cells = append(cells, list(cell))
     }
-  }
-
-  tagList(
-    singleton(tags$head(tags$script(jscode))),
-    tags$svg(
-      `data-input-id` = inputId,
-      class = "minesweeper-grid ongoing",
-      width = "100%",
-      viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
-      tagList(cells)
-    )
   )
 }
 
 defeatGridUI <- function(game, state) {
-  cells = list()
-  for (i in 1:game$nrow) {
-    for (j in 1:game$ncol) {
-      cell = if (state$checked[i, j] && game$mines[i, j]) {
+  gridUI(
+    inputId = NULL,
+    nrow = game$nrow,
+    ncol = game$ncol,
+    status = "defeat",
+    function(i, j) {
+      if (state$checked[i, j] && game$mines[i, j]) {
         wrongCellUI(i, j)
       } else if (state$checked[i, j]) {
         checkedCellUI(i, j, game$nearby_mines[i, j])
@@ -132,38 +146,23 @@ defeatGridUI <- function(game, state) {
       } else {
         hiddenCellUI(i, j)
       }
-
-      cells = append(cells, list(cell))
     }
-  }
-
-  tags$svg(
-    class = "play-grid defeat",
-    width = "100%",
-    viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
-    tagList(cells)
   )
 }
 
 victoryGridUI <- function(game) {
-  cells = list()
-  for (i in 1:game$nrow) {
-    for (j in 1:game$ncol) {
-      cell = if (game$mines[i, j]) {
+  gridUI(
+    inputId = NULL,
+    nrow = game$nrow,
+    ncol = game$ncol,
+    status = "defeat",
+    function(i, j) {
+      if (game$mines[i, j]) {
         flagCellUI(i, j)
       } else {
         checkedCellUI(i, j, game$nearby_mines[i, j])
       }
-
-      cells = append(cells, list(cell))
     }
-  }
-
-  tags$svg(
-    class = "play-grid victory",
-    width = "100%",
-    viewBox = sprintf("1 1 %d %d", game$ncol, game$nrow),
-    tagList(cells)
   )
 }
 
