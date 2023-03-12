@@ -13,17 +13,52 @@ startApp <- function() {
     ),
     mainPanel(
       minesweeperUI("minesweeper"),
-      width=8
+      width=10
     )
   )
 
-  server <- function(input, output) {
+  server <- function(input, output, session) {
+    # set limits of inputs to avoid crash
+    reactiveNrow = reactiveVal()
+    reactiveNcol= reactiveVal()
+    reactiveNmines = reactiveVal()
+
+    observeEvent(input$new_game, {
+      enforceLimit <- function(session, inputId, value, min, max, default) {
+        value = if (!is.integer(value)) {
+          default
+        } else if (value < min) {
+          min
+        } else if (value > max) {
+          max
+        } else {
+          value
+        }
+
+        updateNumericInput(session, inputId, value = value)
+        value
+      }
+
+      reactiveNrow(
+        enforceLimit(session, "nrow", input$nrow, 1, 50, 10)
+      )
+
+      reactiveNcol(
+        enforceLimit(session, "ncol", input$ncol, 1, 50, 10)
+      )
+
+      maxMines = reactiveNrow() * reactiveNcol() - 1
+      reactiveNmines(
+        enforceLimit(session, "nmines", input$nmines, 1, maxMines, 14)
+      )
+    })
+
     minesweeperServer(
       "minesweeper",
       reactive(input$new_game),
-      reactiveNrow = reactive(input$nrow),
-      reactiveNcol = reactive(input$ncol),
-      reactiveNmines = reactive(input$nmines)
+      reactiveNrow = reactiveNrow,
+      reactiveNcol = reactiveNcol,
+      reactiveNmines = reactiveNmines
     )
   }
 
