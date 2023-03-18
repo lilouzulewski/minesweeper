@@ -1,6 +1,12 @@
+#' @import shiny
 library(shiny)
 
-# helper function to create cells
+#' Helper function to create cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
+#' @param name type of the cell
+#' @param class class of the html element
 cellUI <- function(i, j, name, class="") {
   tags$image(
     href = sprintf("assets/svg/%s.svg", name),
@@ -12,14 +18,26 @@ cellUI <- function(i, j, name, class="") {
   )
 }
 
+#' Create hidden cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
 hiddenCellUI <- function(i, j) {
   cellUI(i, j, "hidden", class="hidden-cell")
 }
 
+#' Create flagged cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
 flagCellUI <- function(i, j) {
   cellUI(i, j, "flag", class="flagged-cell")
 }
 
+#' Create wrongly flagged cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
 wrongFlagCellUI <- function(i, j) {
   tagList(
     cellUI(i, j, "flag"),
@@ -27,19 +45,38 @@ wrongFlagCellUI <- function(i, j) {
   )
 }
 
+#' Create checked cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
+#' @param nearby_mines number of nearby mines
 checkedCellUI <- function(i, j, nearby_mines) {
   cellUI(i, j, sprintf("checked_%d", nearby_mines))
 }
 
+#' Create mine cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
 mineCellUI <- function(i, j) {
   cellUI(i, j, "mine")
 }
 
+#' Create wrong cell element
+#'
+#' @param i row of the cell
+#' @param j column of the cell
 wrongCellUI <- function(i, j) {
   cellUI(i, j, "wrong")
 }
 
-# helper function to create gridUI
+#' Helper function to create gridUI
+#'
+#' @param inputId the id of the input
+#' @param nrow number of row
+#' @param ncol number of column
+#' @param status status of the game
+#' @param fun function that take i, j coordinates and return cell element
 gridUI <- function(inputId, nrow, ncol, status, fun) {
   jscode <- r"(
     // Disable menu display on right click on the grid
@@ -108,6 +145,11 @@ gridUI <- function(inputId, nrow, ncol, status, fun) {
   )
 }
 
+#' Create grid element of ongoing game
+#'
+#' @param inputId the input id
+#' @param game the game to display
+#' @param state the current state of the game
 ongoingGridUI <- function(inputId, game, state) {
   gridUI(
     inputId = inputId,
@@ -126,6 +168,10 @@ ongoingGridUI <- function(inputId, game, state) {
   )
 }
 
+#' Create defeat grid element
+#'
+#' @param game the game to display
+#' @param state the current state of the game
 defeatGridUI <- function(game, state) {
   gridUI(
     inputId = NULL,
@@ -150,6 +196,9 @@ defeatGridUI <- function(game, state) {
   )
 }
 
+#' Create victory grid element
+#'
+#' @param game the game to display
 victoryGridUI <- function(game) {
   gridUI(
     inputId = NULL,
@@ -166,6 +215,9 @@ victoryGridUI <- function(game) {
   )
 }
 
+#' Create the full minesweeper ui
+#'
+#' @param id the id of the minesweeper module
 minesweeperUI <- function(id) {
   ns = NS(id)
   tagList(
@@ -176,6 +228,13 @@ minesweeperUI <- function(id) {
   )
 }
 
+#' Create the minesweeper backend
+#'
+#' @param id the id of the minesweeper module
+#' @param reactiveStartGame reactive value that trigger a new game
+#' @param reactiveNrow reactive value that give the number of row
+#' @param reactiveNcol reactive value that give the number of column
+#' @param reactiveNmines reactive value that give the number of mines
 minesweeperServer <- function(
   id,
   reactiveStartGame,

@@ -1,5 +1,8 @@
+#' @import shiny
 library(shiny)
 
+#' Start the application
+#' @export
 startApp <- function() {
   ui <- fluidPage(
     titlePanel("Minesweeper"),
