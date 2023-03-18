@@ -1,11 +1,18 @@
 Package: Minesweeper
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A simple Minesweeper implementation in R with shiny
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: 
+  c(person(given = "Lilou",
+           family = "Zulewski",
+           role = c("aut", "cre"),
+           email = "114218057+lilouzulewski@users.noreply.github.com"),
+    person(given = "Mathieu",
+           family = "Le Séac'h",
+           role = c("aut"),
+           email = "113145496+mle-seach@users.noreply.github.com"))
+Description: This package provides a simple implementation of the Minesweeper
+    game with a graphical interface made with shiny.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
