@@ -34,10 +34,10 @@ startApp()
 
 ## Run tests
 
-To run test you must clone this repository, open and load the project and
-then run:
+To run test you must clone this repository, open and load the project, make sure to install dependencies then run the tests
 
 ``` r
+# install.packages("shiny")
+# install.packages("dequer")
 devtools::test()
 ```
-
