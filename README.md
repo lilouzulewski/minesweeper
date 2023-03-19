@@ -59,8 +59,8 @@ Here is some examples.
 library(Minesweeper)
 
 minesGrid = createMinesGrid(nrow=10, ncol=10, nmines=20)
-game = createGame(mines)
-state = createInitialState(mines)
+game = createGame(minesGrid)
+state = createInitialState(game)
 
 state = revealCell(game, state, 3, 7)
 state = flagCell(state, 2, 4)
