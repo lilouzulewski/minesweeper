@@ -48,3 +48,25 @@ To run test you must clone this repository, open and load the project, make sure
 devtools::test()
 devtools::check()
 ```
+
+## Use as library
+
+You can also use this package as a standalone minesweeper implementation library without the UI.
+
+Here is some examples.
+
+``` r
+library(Minesweeper)
+
+minesGrid = createMineGrid(nrow=10, ncol=10, nmines=20)
+game = createGame(mines)
+state = createInitialState(mines)
+
+state = revealCell(game, state, 3, 7)
+state = flagCell(state, 2, 4)
+state = unflagCell(state, 2, 4)
+
+status = gameStatus(game, state)
+```
+
+You can get more information using `help(flagCell)` for example.
