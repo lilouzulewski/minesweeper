@@ -76,7 +76,7 @@ createNearbyMinesGrid <- function(mines) {
 createInitialState <- function(game) {
   list(
     flagged = createFlaggedGrid(ncol=game$ncol, nrow=game$nrow),
-    checked = createCheckedGrid(ncol=game$ncol, nrow=game$nrow)
+    revealed = createRevealedGrid(ncol=game$ncol, nrow=game$nrow)
   )
 }
 
@@ -88,11 +88,11 @@ createFlaggedGrid <- function(nrow, ncol) {
   matrix(rep(FALSE, nrow * ncol), nrow=nrow, ncol=ncol)
 }
 
-#' Create checked grid
+#' Create revealed grid
 #'
 #' @param nrow number of rows
 #' @param ncol number of columns
-createCheckedGrid <- function(nrow, ncol) {
+createRevealedGrid <- function(nrow, ncol) {
   matrix(rep(FALSE, nrow * ncol), nrow=nrow, ncol=ncol)
 }
 
@@ -119,14 +119,14 @@ unflagCell <- function(state, i, j) {
 }
 
 #' Given a game, a state and i, j return a new state with the cell i, j and
-#' recursively all its non-ambiguous neighbors checked
+#' recursively all its non-ambiguous neighbors revealed
 #'
 #' @export
 #' @param game the game
 #' @param state the state of the game
 #' @param i the row coordinate
 #' @param j the column coordinate
-checkCell <- function(game, state, i, j) {
+revealCell <- function(game, state, i, j) {
   # since R doesn't allow to pass arguments by reference we can't use the
   # straightforward recursive algorithm because of memory usage issues
   remaining_coords = matrix(ncol=2, data=c(i, j))
@@ -141,11 +141,11 @@ checkCell <- function(game, state, i, j) {
     i = coords["i"]
     j = coords["j"]
 
-    if (state$checked[i, j]) {
+    if (state$revealed[i, j]) {
       next
     }
 
-    state$checked[i, j] = TRUE
+    state$revealed[i, j] = TRUE
 
     if (game$nearby_mines[i, j] == 0) {
       remaining_coords = rbind(
@@ -164,11 +164,11 @@ checkCell <- function(game, state, i, j) {
 #' @param game the game
 #' @param state the state of the game
 gameStatus <- function(game, state) {
-  if (any(game$mines & state$checked)) {
+  if (any(game$mines & state$revealed)) {
     return("defeat")
   }
 
-  if (all(xor(game$mines, state$checked))) {
+  if (all(xor(game$mines, state$revealed))) {
     return("victory")
   }
 

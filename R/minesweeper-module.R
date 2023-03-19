@@ -45,13 +45,13 @@ wrongFlagCellUI <- function(i, j) {
   )
 }
 
-#' Create checked cell element
+#' Create revealed cell element
 #'
 #' @param i row of the cell
 #' @param j column of the cell
 #' @param nearby_mines number of nearby mines
-checkedCellUI <- function(i, j, nearby_mines) {
-  cellUI(i, j, sprintf("checked_%d", nearby_mines))
+revealedCellUI <- function(i, j, nearby_mines) {
+  cellUI(i, j, sprintf("revealed_%d", nearby_mines))
 }
 
 #' Create mine cell element
@@ -100,7 +100,7 @@ gridUI <- function(inputId, nrow, ncol, status, fun) {
       const id = getId(target)
 
       Shiny.setInputValue(id, {
-        action: "checkCell",
+        action: "revealCell",
         ...getCoords(target),
       }, { priority: "event" })
     })
@@ -157,8 +157,8 @@ ongoingGridUI <- function(inputId, game, state) {
     ncol = game$ncol,
     status = "ongoing",
     function(i, j) {
-      if (state$checked[i, j]) {
-        checkedCellUI(i, j, game$nearby_mines[i, j])
+      if (state$revealed[i, j]) {
+        revealedCellUI(i, j, game$nearby_mines[i, j])
       } else if (state$flagged[i, j]) {
         flagCellUI(i, j)
       } else {
@@ -179,10 +179,10 @@ defeatGridUI <- function(game, state) {
     ncol = game$ncol,
     status = "defeat",
     function(i, j) {
-      if (state$checked[i, j] && game$mines[i, j]) {
+      if (state$revealed[i, j] && game$mines[i, j]) {
         wrongCellUI(i, j)
-      } else if (state$checked[i, j]) {
-        checkedCellUI(i, j, game$nearby_mines[i, j])
+      } else if (state$revealed[i, j]) {
+        revealedCellUI(i, j, game$nearby_mines[i, j])
       } else if (state$flagged[i, j] && !game$mines[i, j]) {
         wrongFlagCellUI(i, j)
       } else if (state$flagged[i, j]) {
@@ -209,7 +209,7 @@ victoryGridUI <- function(game) {
       if (game$mines[i, j]) {
         flagCellUI(i, j)
       } else {
-        checkedCellUI(i, j, game$nearby_mines[i, j])
+        revealedCellUI(i, j, game$nearby_mines[i, j])
       }
     }
   )
@@ -282,8 +282,8 @@ minesweeperServer <- function(
         i = event$i
         j = event$j
 
-        newState = if (action == "checkCell") {
-          checkCell(game, state, i, j)
+        newState = if (action == "revealCell") {
+          revealCell(game, state, i, j)
         } else if (action == "flagCell") {
           if (sum(state$flagged) < game$nmines) {
             flagCell(state, i, j)
@@ -323,7 +323,7 @@ minesweeperServer <- function(
         game = reactiveGame()
         state = reactiveState()
 
-        sprintf("Remaining flags: %d", game$nmines - sum(state$flagged & !state$checked))
+        sprintf("Remaining flags: %d", game$nmines - sum(state$flagged & !state$revealed))
       })
 
       output$timer <- renderText({

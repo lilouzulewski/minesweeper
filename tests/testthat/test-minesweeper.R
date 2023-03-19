@@ -76,8 +76,8 @@ test_that("createInitialState works", {
   game = createGame(mines)
   state = createInitialState(game)
 
-  expect_equal(dim(state$checked), c(20, 15))
-  expect_equal(any(state$checked), FALSE)
+  expect_equal(dim(state$revealed), c(20, 15))
+  expect_equal(any(state$revealed), FALSE)
 
   expect_equal(dim(state$flagged), c(20, 15))
   expect_equal(any(state$flagged), FALSE)
@@ -131,7 +131,7 @@ test_that("unflagCell works", {
   )
 })
 
-test_that("checkCell works", {
+test_that("revealCell works", {
   mines = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
     0, 0, 0, 0, 0, 0, 0, 0,
     1, 0, 0, 0, 0, 0, 0, 0,
@@ -143,7 +143,7 @@ test_that("checkCell works", {
   state = createInitialState(game)
 
   expect_equal(
-    checkCell(game, state, 1, 2)$checked,
+    revealCell(game, state, 1, 2)$revealed,
     matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
       0, 1, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
@@ -153,7 +153,7 @@ test_that("checkCell works", {
   )
 
   expect_equal(
-    checkCell(game, state, 2, 4)$checked,
+    revealCell(game, state, 2, 4)$revealed,
     matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
       0, 1, 1, 1, 1, 1, 1, 1,
       0, 1, 1, 1, 1, 1, 1, 1,
@@ -163,7 +163,7 @@ test_that("checkCell works", {
   )
 
   expect_equal(
-    checkCell(game, state, 2, 1)$checked,
+    revealCell(game, state, 2, 1)$revealed,
     matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
       0, 0, 0, 0, 0, 0, 0, 0,
       1, 0, 0, 0, 0, 0, 0, 0,
@@ -173,13 +173,13 @@ test_that("checkCell works", {
   )
 })
 
-test_that("checkCell reasonnable memory usage", {
+test_that("revealCell reasonnable memory usage", {
   mines = matrix(nrow=50, ncol=50, data=FALSE)
   game = createGame(mines)
   state = createInitialState(game)
 
   expect_no_error({
-    checkCell(game, state, 1, 1)
+    revealCell(game, state, 1, 1)
   })
 })
 
@@ -201,7 +201,7 @@ test_that("gameStatus works", {
 
   state = list(
     flagged = state$flagged,
-    checked = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
+    revealed = matrix(nrow=4, ncol=8, byrow=TRUE, data=as.logical(c(
       0, 0, 0, 0, 0, 0, 0, 0,
       1, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0,
@@ -215,7 +215,7 @@ test_that("gameStatus works", {
 
   state = list(
     flagged = state$flagged,
-    checked = !mines
+    revealed = !mines
   )
 
   expect_equal(
