@@ -58,7 +58,7 @@ Here is some examples.
 ``` r
 library(Minesweeper)
 
-minesGrid = createMineGrid(nrow=10, ncol=10, nmines=20)
+minesGrid = createMinesGrid(nrow=10, ncol=10, nmines=20)
 game = createGame(mines)
 state = createInitialState(mines)
 
