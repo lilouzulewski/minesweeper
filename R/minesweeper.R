@@ -1,3 +1,6 @@
+#' @import dequer
+library(dequer)
+
 #' Create a game object
 #'
 #' @export
@@ -129,17 +132,13 @@ unflagCell <- function(state, i, j) {
 revealCell <- function(game, state, i, j) {
   # since R doesn't allow to pass arguments by reference we can't use the
   # straightforward recursive algorithm because of memory usage issues
-  remaining_coords = matrix(ncol=2, data=c(i, j))
-  colnames(remaining_coords) <- c("i", "j")
+  remaining_coords = as.stack(c(i, j))
 
   while (length(remaining_coords) > 0) {
-    last = nrow(remaining_coords)
+    coords = pop(remaining_coords)
 
-    coords = remaining_coords[last,]
-    remaining_coords = remaining_coords[-last,, drop=FALSE]
-
-    i = coords["i"]
-    j = coords["j"]
+    i = coords[1]
+    j = coords[2]
 
     if (state$revealed[i, j]) {
       next
@@ -148,9 +147,17 @@ revealCell <- function(game, state, i, j) {
     state$revealed[i, j] = TRUE
 
     if (game$nearby_mines[i, j] == 0) {
-      remaining_coords = rbind(
-        remaining_coords,
-        nearbyCoords(i, j, nrow=game$nrow, ncol=game$ncol)
+      apply(
+        nearbyCoords(i, j, nrow=game$nrow, ncol=game$ncol),
+        1,
+        function(coords) {
+          i = coords[1]
+          j = coords[2]
+
+          if (!state$revealed[i, j]) {
+            push(remaining_coords, c(i, j))
+          }
+        }
       )
     }
   }
