@@ -12,13 +12,17 @@ You can install the development version of Minesweeper from [GitHub](https://git
 
 ``` r
 # install.packages("devtools")
+
 devtools::install_github("lilouzulewski/minesweeper")
 ```
 
-You can also clone this repository, open the project and then run:
+You can also clone this repository, open the project, install the dependencies and then run:
 
 ``` r
 # install.packages("devtools")
+# install.packages("shiny")
+# install.packages("dequer")
+
 devtools::load_all()
 ```
 
@@ -32,12 +36,15 @@ library(Minesweeper)
 startApp()
 ```
 
-## Run tests
+## Run test and check
 
-To run test you must clone this repository, open and load the project, make sure to install dependencies then run the tests
+To run test you must clone this repository, open and load the project, make sure to install dependencies then run:
 
 ``` r
+# install.packages("devtools")
 # install.packages("shiny")
 # install.packages("dequer")
+
 devtools::test()
+devtools::check()
 ```
