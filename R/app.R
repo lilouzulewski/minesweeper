@@ -7,10 +7,11 @@ library(shinythemes)
 startApp <- function() {
   ui <- fluidPage(
     titlePanel("Minesweeper"),
+    theme = shinythemes::shinytheme("darkly"),
     helpText("Left click to reveal cell, right click to flag mine"),
     sidebarPanel(
-      numericInput("nrow", label = "Number of row", value = 10),
-      numericInput("ncol", label = "Number of column", value = 10),
+      numericInput("nrow", label = "Number of rows", value = 10),
+      numericInput("ncol", label = "Number of columns", value = 10),
       numericInput("nmines", label = "Number of mines", value = 14),
       actionButton("new_game", "New game"),
       width = 2
