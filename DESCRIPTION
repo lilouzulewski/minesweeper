@@ -18,7 +18,8 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     dequer,
-    shiny (>= 1.7.4)
+    shiny (>= 1.7.4),
+    shinythemes
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
