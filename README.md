@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This repository host an implementation of Minesweeper written in R and shiny.
+This repository hosts an implementation of Minesweeper written in R and shiny.
 
 ## Installation
 
