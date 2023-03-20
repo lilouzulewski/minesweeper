@@ -173,10 +173,33 @@ victoryGridUI <- function(game) {
 minesweeperUI <- function(id) {
   ns = NS(id)
   tagList(
-    textOutput(ns("game_status")),
+    uiOutput(ns("game_status")),
     textOutput(ns("flag_count")),
     textOutput(ns("timer")),
     uiOutput(ns("play_grid"))
+  )
+}
+
+#' Create the status ui
+#'
+#' @param status current status of the game
+statusUI <- function(status) {
+  capitalize <- function(str) {
+    paste0(toupper(substr(str, 1, 1)), substr(str, 2, nchar(str)))
+  }
+
+  color = if (status == "ongoing") {
+    "white"
+  } else if (status == "victory") {
+    "green"
+  } else if (status == "defeat") {
+    "red"
+  }
+
+
+  tags$b(
+    style = sprintf("color: %s;", color),
+    capitalize(status)
   )
 }
 
@@ -265,10 +288,13 @@ minesweeperServer <- function(
         }
       })
 
-      output$game_status <- renderText({
+      output$game_status <- renderUI({
         status = reactiveGameStatus()
 
-        sprintf("Game status: %s", status)
+        tags$p(
+          "Game status:",
+          statusUI(status)
+        )
       })
 
       output$flag_count <- renderText({
@@ -290,6 +316,17 @@ minesweeperServer <- function(
         })
 
         sprintf("Elapsed time: %02d:%02d", floor(elapsedTime() / 60), elapsedTime() %% 60);
+      })
+
+      observeEvent(reactiveGameStatus(), {
+        status = reactiveGameStatus()
+        if (status != "ongoing") {
+          showModal(modalDialog(
+            statusUI(status),
+            easyClose = TRUE,
+            fade = TRUE
+          ))
+        }
       })
     }
   )
