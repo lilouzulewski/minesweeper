@@ -24,9 +24,9 @@ startApp <- function() {
 
   server <- function(input, output, session) {
     # set limits of inputs to avoid crash
-    reactiveNrow = reactiveVal()
-    reactiveNcol= reactiveVal()
-    reactiveNmines = reactiveVal()
+    reactiveNrow = reactiveVal(10)
+    reactiveNcol= reactiveVal(10)
+    reactiveNmines = reactiveVal(14)
 
     observeEvent(input$new_game, {
       enforceLimit <- function(session, inputId, value, min, max, default) {
