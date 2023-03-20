@@ -1,5 +1,6 @@
 #' @import shiny
 library(shiny)
+library(shinythemes)
 
 #' Start the application
 #' @export

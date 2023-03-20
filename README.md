@@ -21,6 +21,7 @@ You can also clone this repository, open the project, install the dependencies a
 ``` r
 # install.packages("devtools")
 # install.packages("shiny")
+# install.packages("shinythemes")
 # install.packages("dequer")
 
 devtools::load_all()
